@@ -16,7 +16,9 @@ package com.google.android.ads.nativetemplates;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -45,6 +47,8 @@ public final class TemplateView extends FrameLayout {
   private TextView secondaryView;
   private RatingBar ratingBar;
   private TextView tertiaryView;
+
+  private TextView adTextView;
   private ImageView iconView;
   private MediaView mediaView;
   private Button callToActionView;
@@ -131,6 +135,7 @@ public final class TemplateView extends FrameLayout {
 
     if (styles.getCallToActionTypefaceColor() != null && callToActionView != null) {
       callToActionView.setTextColor(styles.getCallToActionTypefaceColor());
+      adTextView.setTextColor(styles.getCallToActionTypefaceColor());
     }
 
     float ctaTextSize = styles.getCallToActionTextSize();
@@ -158,6 +163,13 @@ public final class TemplateView extends FrameLayout {
       callToActionView.setBackground(ctaBackground);
     }
 
+    if(ctaBackground != null){
+      adTextView.setBackground(ctaBackground);
+      if(getColorFromDrawable(ctaBackground) != null){
+        ratingBar.getProgressDrawable().setColorFilter(getColorFromDrawable(ctaBackground), PorterDuff.Mode.SRC_IN);
+      }
+    }
+
     Drawable primaryBackground = styles.getPrimaryTextBackgroundColor();
     if (primaryBackground != null && primaryView != null) {
       primaryView.setBackground(primaryBackground);
@@ -175,6 +187,14 @@ public final class TemplateView extends FrameLayout {
 
     invalidate();
     requestLayout();
+  }
+
+  private Integer getColorFromDrawable(Drawable drawable) {
+    if (drawable instanceof ColorDrawable) {
+      return ((ColorDrawable) drawable).getColor();
+    }
+    // Handle other cases if necessary
+    return null;
   }
 
   private boolean adHasOnlyStore(NativeAd nativeAd) {
@@ -283,6 +303,7 @@ public final class TemplateView extends FrameLayout {
     primaryView = (TextView) findViewById(R.id.primary);
     secondaryView = (TextView) findViewById(R.id.secondary);
     tertiaryView = (TextView) findViewById(R.id.body);
+    adTextView = findViewById(R.id.ad_notification_view);
 
     ratingBar = (RatingBar) findViewById(R.id.rating_bar);
     ratingBar.setEnabled(false);
